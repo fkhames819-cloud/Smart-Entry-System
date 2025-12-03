@@ -52,8 +52,8 @@
         #savedCodesList li {
             background-color: #e9ecef; margin-bottom: 8px; padding: 10px;
             border-radius: 6px; 
-            display: flex; /* لترتيب العناصر على سطر واحد */
-            justify-content: space-between; /* لتوزيع الاسم وزر المسح */
+            display: flex; 
+            justify-content: space-between; 
             align-items: center;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
@@ -61,9 +61,9 @@
 
         /* اسم الكود المحفوظ (الـ Total) */
         .saved-code-name {
-            flex-grow: 1; /* للسماح للاسم بأخذ المساحة المتبقية */
+            flex-grow: 1; 
             text-align: right;
-            cursor: pointer; /* للإشارة إلى أنه قابل للنقر للدخول */
+            cursor: pointer; 
             padding-left: 10px;
         }
 
@@ -106,7 +106,7 @@
     <div id="loginScreen">
         <h1>🔑 نظام الدخول الذكي</h1>
         
-        <input type="text" id="accessCode" placeholder="أدخل الرمز هنا (مثال: 123.456.789)">
+        <input type="text" id="accessCode" placeholder="أدخل الرمز هنا (مثال: 123.456.789 أو 11342)">
         <button id="loginButton">دخول وتسجيل</button>
         <hr>
 
@@ -122,9 +122,25 @@
     <button id="exitButton">❌</button>
 
     <script>
-        const ACCESS_URL = "https://fkhames819-cloud.github.io/ALGEL-ALKHAMES/";
+        // تعريف الروابط والأكواد
+        const ACCESS_URL_DEFAULT = "https://fkhames819-cloud.github.io/ALGEL-ALKHAMES/";
         const SAVED_CODES_KEY = "algil_alkhames_codes";
-        const TARGET_CODE_EXAMPLE = "123.456.789"; 
+
+        // **تعريف كل الأكواد التي يمكن حفظها وروابطها (تمت إضافة 11342)**
+        const SAVABLE_CODES_MAP = {
+            "123.456.789": "https://fkhames819-cloud.github.io/ALGEL-ALKHAMES/",
+            "987.654.321": "https://example.com/page1", 
+            "111.222.333": "https://anothersite.net/pageA", 
+            // **الكود الجديد:**
+            "11342": "https://poki.com/ar/" 
+        };
+        
+        // تعريف كل الأكواد التي لا يتم حفظها (الدخول المباشر)
+        const DIRECT_ENTRY_CODES_MAP = {
+            "121.324.543": "https://fkhames819-cloud.github.io/ALGEL-ALKHAMES/",
+            "444.555.666": "https://quick-access.org/q1", 
+            "000.111.222": "https://tools-site.com/t2" 
+        };
 
         const loginScreen = document.getElementById('loginScreen');
         const websiteContainer = document.getElementById('websiteContainer');
@@ -134,7 +150,6 @@
         const savedCodesList = document.getElementById('savedCodesList');
         const exitButton = document.getElementById('exitButton');
 
-        let exitClickCount = 0;
         let isDragging = false;
         let offset = { x: 0, y: 0 };
         let lastClickTime = 0; 
@@ -152,23 +167,20 @@
 
         function saveCode(code, total) {
             const codes = getSavedCodes();
-            if (!codes.find(item => item.code === code)) {
-                // إضافة معرّف فريد بسيط لكل كود جديد
+            // تحقق من الكود القابل للحفظ ووجوده في الخريطة
+            if (SAVABLE_CODES_MAP[code] && !codes.find(item => item.code === code)) {
                 const id = Date.now().toString(); 
-                codes.push({ id, code, total, savedAt: new Date().toISOString() });
+                codes.push({ id, code, total, url: SAVABLE_CODES_MAP[code] }); // حفظ الرابط أيضاً
                 localStorage.setItem(SAVED_CODES_KEY, JSON.stringify(codes));
             }
         }
 
-        // **وظيفة مسح كود واحد**
+        // وظيفة مسح كود واحد
         function deleteSingleCode(idToDelete) {
             let codes = getSavedCodes();
-            
-            // تصفية الأكواد لإزالة الكود الذي يتطابق مع المعرّف
             codes = codes.filter(item => item.id !== idToDelete);
-            
             localStorage.setItem(SAVED_CODES_KEY, JSON.stringify(codes));
-            renderSavedCodes(); // إعادة عرض القائمة المحدثة
+            renderSavedCodes(); 
             alert("تم مسح الكود بنجاح!");
         }
 
@@ -183,20 +195,18 @@
             codes.forEach(item => {
                 const li = document.createElement('li');
                 
-                // 1. عنصر اسم الكود (للدخول)
                 const nameSpan = document.createElement('span');
                 nameSpan.className = 'saved-code-name';
                 nameSpan.textContent = `📄 ${item.total}`; 
                 nameSpan.addEventListener('click', () => { 
-                    enterWebsite(item.code); 
+                    enterWebsite(item.url, item.code); // نستخدم الرابط المحفوظ
                 });
 
-                // 2. زر المسح الفردي
                 const deleteButton = document.createElement('button');
                 deleteButton.className = 'delete-single-button';
                 deleteButton.textContent = '❌ مسح';
                 deleteButton.addEventListener('click', (e) => {
-                    e.stopPropagation(); // منع انتقال النقر إلى الـ li (التي تسبب الدخول)
+                    e.stopPropagation(); 
                     const confirmation = confirm(`هل أنت متأكد من مسح صفحة "${item.total}"؟`);
                     if (confirmation) {
                          deleteSingleCode(item.id);
@@ -209,8 +219,10 @@
             });
         }
         
-        function enterWebsite(code) {
-            websiteFrame.src = ACCESS_URL + `?code=${code}`; 
+        // تم تحديث الدالة لتأخذ الرابط والكود
+        function enterWebsite(url, code) {
+            // يتم توجيه الرابط وإضافة الكود كمتغير (query parameter)
+            websiteFrame.src = url + `?code=${code}`; 
             
             loginScreen.style.display = 'none';
             websiteContainer.style.display = 'block';
@@ -221,29 +233,44 @@
         // 2. منطق زر الدخول
         loginButton.addEventListener('click', () => {
             const code = codeInput.value.trim();
-            // بما أننا أضفنا مُعرّف (id) للكود، يجب أن نعتمد عليه للتحقق
-            let isKnownCode = getSavedCodes().some(item => item.code === code);
-
-            if (code === TARGET_CODE_EXAMPLE) {
-                if (!isKnownCode) {
+            const knownSavableCode = SAVABLE_CODES_MAP[code]; // التحقق من الأكواد القابلة للحفظ
+            const knownDirectCode = DIRECT_ENTRY_CODES_MAP[code]; // التحقق من أكواد الدخول المباشر
+            const isSavedCode = getSavedCodes().some(item => item.code === code); // التحقق من الأكواد المحفوظة مسبقاً
+            
+            // 1. الدخول المباشر (الرمز موجود في خريطة DIRECT_ENTRY_CODES_MAP)
+            if (knownDirectCode) {
+                alert("تم التعرف على الرمز الخاص (بدون تسجيل). جاري الدخول المباشر...");
+                enterWebsite(knownDirectCode, code); 
+            } 
+            // 2. الدخول القابل للحفظ (الرمز موجود في خريطة SAVABLE_CODES_MAP)
+            else if (knownSavableCode) {
+                if (!isSavedCode) {
                     const now = new Date();
-                    const totalName = `صفحة الدخول: ${now.toLocaleDateString()} - ${now.toLocaleTimeString()}`; 
+                    // اسم فريد يعتمد على الكود والرابط
+                    const totalName = (knownSavableCode.includes("poki.com")) ? 
+                        `لعبة بوكي (Poki) - الكود: ${code}` : 
+                        `الدخول لـ: ${knownSavableCode.substring(8, 25)}...`; 
                     saveCode(code, totalName);
                     renderSavedCodes();
                     alert(`تم تسجيل الكود بنجاح باسم "${totalName}". جاري الدخول...`);
                 } else {
                     alert("تم التعرف على الكود. جاري الدخول...");
                 }
-                enterWebsite(code);
-            } else if (isKnownCode) {
+                enterWebsite(knownSavableCode, code);
+            } 
+            // 3. الدخول بالكود المحفوظ مسبقاً
+            else if (isSavedCode) {
+                const savedItem = getSavedCodes().find(item => item.code === code);
                 alert("تم التعرف على الكود المحفوظ. جاري الدخول...");
-                enterWebsite(code);
-            } else {
+                enterWebsite(savedItem.url, savedItem.code);
+            } 
+            // 4. الرمز غير معروف
+            else {
                 alert("رمز الدخول غير صحيح أو غير مسجّل. يرجى إدخال الرمز الصحيح للمتابعة.");
             }
         });
 
-        // 3. وظيفة الخروج (تم فصلها لتنفيذها من منطق السحب)
+        // 3. وظيفة الخروج (ضغطة مزدوجة)
         function handleDoubleClickExit() {
             websiteFrame.src = "about:blank"; 
             websiteContainer.style.display = 'none';
@@ -259,14 +286,12 @@
             e.preventDefault(); 
             const clickTime = Date.now();
             
-            // إذا كانت الضغطة الثانية سريعة، ننفذ الخروج
             if (clickTime - lastClickTime < 400) { 
                 handleDoubleClickExit();
                 isDragging = false; 
                 return;
             }
             
-            // وإلا، نبدأ عملية السحب
             isDragging = true;
             offset.x = e.clientX - exitButton.offsetLeft;
             offset.y = e.clientY - exitButton.offsetTop;
@@ -279,7 +304,6 @@
             const newX = e.clientX - offset.x;
             const newY = e.clientY - offset.y;
             
-            // تطبيق الموقع الجديد
             exitButton.style.left = newX + 'px';
             exitButton.style.top = newY + 'px';
         });
