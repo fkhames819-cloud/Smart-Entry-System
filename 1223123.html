@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔑 نظام الدخول الذكي والمعاصر</title>
+    
+    <style>
+        /* تخطيط الصفحة الأساسي */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+            overflow: hidden; 
+        }
+
+        /* حاوية شاشة الدخول */
+        #loginScreen {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        h1, h2 { color: #007bff; margin-bottom: 20px; }
+        hr { border: 0; height: 1px; background-color: #ddd; margin: 20px 0; }
+        
+        input[type="text"] {
+            width: 90%; padding: 12px; margin-bottom: 15px; border: 2px solid #ccc;
+            border-radius: 8px; font-size: 16px; transition: border-color 0.3s;
+            text-align: center;
+        }
+
+        #loginButton {
+            background-color: #28a745; color: white; border: none;
+            padding: 12px 30px; border-radius: 8px; cursor: pointer;
+            font-size: 18px; font-weight: bold; transition: background-color 0.3s;
+            margin-bottom: 10px;
+        }
+        #loginButton:hover { background-color: #218838; }
+
+        /* الأكواد المحفوظة والقائمة */
+        #savedCodesList { list-style: none; padding: 0; margin-top: 15px; }
+        #savedCodesList li {
+            background-color: #e9ecef; margin-bottom: 8px; padding: 10px;
+            border-radius: 6px; 
+            display: flex; /* لترتيب العناصر على سطر واحد */
+            justify-content: space-between; /* لتوزيع الاسم وزر المسح */
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        #savedCodesList li:hover { background-color: #dee2e6; transform: translateY(-2px); }
+
+        /* اسم الكود المحفوظ (الـ Total) */
+        .saved-code-name {
+            flex-grow: 1; /* للسماح للاسم بأخذ المساحة المتبقية */
+            text-align: right;
+            cursor: pointer; /* للإشارة إلى أنه قابل للنقر للدخول */
+            padding-left: 10px;
+        }
+
+        /* زر مسح العنصر */
+        .delete-single-button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        .delete-single-button:hover { background-color: #c82333; }
+
+
+        /* حاوية الموقع داخل الصفحة (iframe) */
+        #websiteContainer {
+            width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; z-index: 900;
+            display: none; 
+        }
+        #websiteFrame { width: 100%; height: 100%; border: none; }
+
+        /* زر الخروج العائم */
+        #exitButton {
+            position: fixed; top: 20px; left: 20px; 
+            background: #dc3545; color: white; border: none;
+            border-radius: 50%; width: 55px; height: 55px; font-size: 24px;
+            cursor: move; 
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            z-index: 1000; display: none; 
+            transition: background 0.2s; 
+        }
+        #exitButton:hover { background: #c82333; }
+    </style>
+</head>
+<body>
+    
+    <div id="loginScreen">
+        <h1>🔑 نظام الدخول الذكي</h1>
+        
+        <input type="text" id="accessCode" placeholder="أدخل الرمز هنا (مثال: 123.456.789)">
+        <button id="loginButton">دخول وتسجيل</button>
+        <hr>
+
+        <h2>📚 الدخول عبر الأكواد المحفوظة</h2>
+        <ul id="savedCodesList">
+            </ul>
+    </div>
+
+    <div id="websiteContainer">
+        <iframe id="websiteFrame" src="" title="الموقع الداخلي"></iframe>
+    </div>
+
+    <button id="exitButton">❌</button>
+
+    <script>
+        const ACCESS_URL = "https://fkhames819-cloud.github.io/ALGEL-ALKHAMES/";
+        const SAVED_CODES_KEY = "algil_alkhames_codes";
+        const TARGET_CODE_EXAMPLE = "123.456.789"; 
+
+        const loginScreen = document.getElementById('loginScreen');
+        const websiteContainer = document.getElementById('websiteContainer');
+        const websiteFrame = document.getElementById('websiteFrame');
+        const codeInput = document.getElementById('accessCode');
+        const loginButton = document.getElementById('loginButton');
+        const savedCodesList = document.getElementById('savedCodesList');
+        const exitButton = document.getElementById('exitButton');
+
+        let exitClickCount = 0;
+        let isDragging = false;
+        let offset = { x: 0, y: 0 };
+        let lastClickTime = 0; 
+
+        // 1. وظائف التخزين المحلي
+        function getSavedCodes() {
+            try {
+                const codes = localStorage.getItem(SAVED_CODES_KEY);
+                return codes ? JSON.parse(codes) : [];
+            } catch (e) {
+                console.error("Error reading LocalStorage:", e);
+                return [];
+            }
+        }
+
+        function saveCode(code, total) {
+            const codes = getSavedCodes();
+            if (!codes.find(item => item.code === code)) {
+                // إضافة معرّف فريد بسيط لكل كود جديد
+                const id = Date.now().toString(); 
+                codes.push({ id, code, total, savedAt: new Date().toISOString() });
+                localStorage.setItem(SAVED_CODES_KEY, JSON.stringify(codes));
+            }
+        }
+
+        // **وظيفة مسح كود واحد**
+        function deleteSingleCode(idToDelete) {
+            let codes = getSavedCodes();
+            
+            // تصفية الأكواد لإزالة الكود الذي يتطابق مع المعرّف
+            codes = codes.filter(item => item.id !== idToDelete);
+            
+            localStorage.setItem(SAVED_CODES_KEY, JSON.stringify(codes));
+            renderSavedCodes(); // إعادة عرض القائمة المحدثة
+            alert("تم مسح الكود بنجاح!");
+        }
+
+        function renderSavedCodes() {
+            savedCodesList.innerHTML = '';
+            const codes = getSavedCodes();
+            if (codes.length === 0) {
+                savedCodesList.innerHTML = '<li style="text-align: center; color: #999;">لا توجد أكواد محفوظة بعد.</li>';
+                return;
+            }
+            
+            codes.forEach(item => {
+                const li = document.createElement('li');
+                
+                // 1. عنصر اسم الكود (للدخول)
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'saved-code-name';
+                nameSpan.textContent = `📄 ${item.total}`; 
+                nameSpan.addEventListener('click', () => { 
+                    enterWebsite(item.code); 
+                });
+
+                // 2. زر المسح الفردي
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'delete-single-button';
+                deleteButton.textContent = '❌ مسح';
+                deleteButton.addEventListener('click', (e) => {
+                    e.stopPropagation(); // منع انتقال النقر إلى الـ li (التي تسبب الدخول)
+                    const confirmation = confirm(`هل أنت متأكد من مسح صفحة "${item.total}"؟`);
+                    if (confirmation) {
+                         deleteSingleCode(item.id);
+                    }
+                });
+
+                li.appendChild(nameSpan);
+                li.appendChild(deleteButton);
+                savedCodesList.appendChild(li);
+            });
+        }
+        
+        function enterWebsite(code) {
+            websiteFrame.src = ACCESS_URL + `?code=${code}`; 
+            
+            loginScreen.style.display = 'none';
+            websiteContainer.style.display = 'block';
+            exitButton.style.display = 'block';
+            document.body.style.overflow = 'hidden'; 
+        }
+
+        // 2. منطق زر الدخول
+        loginButton.addEventListener('click', () => {
+            const code = codeInput.value.trim();
+            // بما أننا أضفنا مُعرّف (id) للكود، يجب أن نعتمد عليه للتحقق
+            let isKnownCode = getSavedCodes().some(item => item.code === code);
+
+            if (code === TARGET_CODE_EXAMPLE) {
+                if (!isKnownCode) {
+                    const now = new Date();
+                    const totalName = `صفحة الدخول: ${now.toLocaleDateString()} - ${now.toLocaleTimeString()}`; 
+                    saveCode(code, totalName);
+                    renderSavedCodes();
+                    alert(`تم تسجيل الكود بنجاح باسم "${totalName}". جاري الدخول...`);
+                } else {
+                    alert("تم التعرف على الكود. جاري الدخول...");
+                }
+                enterWebsite(code);
+            } else if (isKnownCode) {
+                alert("تم التعرف على الكود المحفوظ. جاري الدخول...");
+                enterWebsite(code);
+            } else {
+                alert("رمز الدخول غير صحيح أو غير مسجّل. يرجى إدخال الرمز الصحيح للمتابعة.");
+            }
+        });
+
+        // 3. وظيفة الخروج (تم فصلها لتنفيذها من منطق السحب)
+        function handleDoubleClickExit() {
+            websiteFrame.src = "about:blank"; 
+            websiteContainer.style.display = 'none';
+            exitButton.style.display = 'none';
+            loginScreen.style.display = 'block';
+            document.body.style.overflow = 'auto'; 
+            
+            alert("تم الخروج من الموقع الداخلي والعودة إلى شاشة البوابة.");
+        }
+
+        // 4. منطق السحب والإفلات لزر الخروج (Drag and Drop Logic)
+        exitButton.addEventListener('mousedown', (e) => {
+            e.preventDefault(); 
+            const clickTime = Date.now();
+            
+            // إذا كانت الضغطة الثانية سريعة، ننفذ الخروج
+            if (clickTime - lastClickTime < 400) { 
+                handleDoubleClickExit();
+                isDragging = false; 
+                return;
+            }
+            
+            // وإلا، نبدأ عملية السحب
+            isDragging = true;
+            offset.x = e.clientX - exitButton.offsetLeft;
+            offset.y = e.clientY - exitButton.offsetTop;
+            lastClickTime = clickTime;
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            
+            const newX = e.clientX - offset.x;
+            const newY = e.clientY - offset.y;
+            
+            // تطبيق الموقع الجديد
+            exitButton.style.left = newX + 'px';
+            exitButton.style.top = newY + 'px';
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+
+        // عند تحميل الصفحة
+        window.onload = renderSavedCodes;
+    </script>
+</body>
+</html>
