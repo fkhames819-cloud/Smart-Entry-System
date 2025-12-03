@@ -3,139 +3,422 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔑 نظام الدخول الذكي والمعاصر</title>
+    <title>نظام الدخول الذكي والمعاصر</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     
     <style>
-        /* تخطيط الصفحة الأساسي */
+        /* ========================================================= */
+        /* الأنماط العامة وإعداد الأيقونات */
+        /* ========================================================= */
+        
+        .material-symbols-rounded {
+          font-variation-settings:
+          'FILL' 0,
+          'wght' 400,
+          'GRAD' 0,
+          'opsz' 24;
+        }
+
+        /* الوضع الفاتح (Default) */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
-            display: flex;
+            font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ffffff;
+            display: flex; 
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
             color: #333;
+            transition: background-color 0.4s, color 0.4s;
             overflow: hidden; 
         }
 
         /* حاوية شاشة الدخول */
         #loginScreen {
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            background-color: transparent; 
+            padding: 40px 20px;
             width: 90%;
-            max-width: 500px;
+            max-width: 650px; 
             text-align: center;
         }
-
-        h1, h2 { color: #007bff; margin-bottom: 20px; }
-        hr { border: 0; height: 1px; background-color: #ddd; margin: 20px 0; }
         
+        h1 { 
+            color: #007bff; 
+            margin-bottom: 30px; 
+            font-size: 28px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #007bff;
+            display: inline-block;
+            transition: color 0.4s, border-color 0.4s;
+        }
+        
+        hr { 
+            border: 0; 
+            height: 1px; 
+            background-image: linear-gradient(to right, rgba(0, 0, 0, 0), #007bff, rgba(0, 0, 0, 0));
+            margin: 30px 0; 
+            transition: background-image 0.4s;
+        }
+        
+        /* حقول الإدخال */
         input[type="text"] {
-            width: 90%; padding: 12px; margin-bottom: 15px; border: 2px solid #ccc;
-            border-radius: 8px; font-size: 16px; transition: border-color 0.3s;
-            text-align: center;
-        }
-
-        #loginButton {
-            background-color: #28a745; color: white; border: none;
-            padding: 12px 30px; border-radius: 8px; cursor: pointer;
-            font-size: 18px; font-weight: bold; transition: background-color 0.3s;
-            margin-bottom: 10px;
-        }
-        #loginButton:hover { background-color: #218838; }
-
-        /* الأكواد المحفوظة والقائمة */
-        #savedCodesList { list-style: none; padding: 0; margin-top: 15px; }
-        #savedCodesList li {
-            background-color: #e9ecef; margin-bottom: 8px; padding: 10px;
-            border-radius: 6px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-        }
-        #savedCodesList li:hover { background-color: #dee2e6; transform: translateY(-2px); }
-
-        /* اسم الكود المحفوظ (الـ Total) */
-        .saved-code-name {
-            flex-grow: 1; 
+            width: 90%; 
+            padding: 15px; 
+            margin-bottom: 20px; 
+            border: 1px solid #ddd;
+            border-radius: 10px; 
+            font-size: 17px; 
+            transition: border-color 0.3s, box-shadow 0.3s, background-color 0.4s, color 0.4s;
             text-align: right;
-            cursor: pointer; 
-            padding-left: 10px;
+            background-color: #f9f9f9; 
+            color: #333; 
+        }
+        input[type="text"]:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+            outline: none;
         }
 
-        /* زر مسح العنصر */
-        .delete-single-button {
-            background-color: #dc3545;
-            color: white;
+        /* زر الدخول */
+        #loginButton {
+            background-color: #28a745; 
+            color: white; 
             border: none;
-            padding: 5px 10px;
-            border-radius: 6px;
+            padding: 15px 40px; 
+            border-radius: 10px; 
             cursor: pointer;
-            font-size: 14px;
-            transition: background-color 0.3s;
+            font-size: 19px; 
+            font-weight: bold; 
+            letter-spacing: 1px;
+            transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
         }
-        .delete-single-button:hover { background-color: #c82333; }
+        #loginButton:hover { background-color: #218838; box-shadow: 0 3px 10px rgba(40, 167, 69, 0.6); }
+        #loginButton:active { transform: scale(0.98); }
 
-
-        /* حاوية الموقع داخل الصفحة (iframe) */
-        #websiteContainer {
-            width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; z-index: 900;
-            display: none; 
+        /* ========================================================= */
+        /* أنماط الوضع الداكن (Dark Mode) */
+        /* ========================================================= */
+        .dark-mode {
+            background-color: #121212; 
+            color: #e0e0e0; 
         }
-        #websiteFrame { width: 100%; height: 100%; border: none; }
 
-        /* زر الخروج العائم */
+        .dark-mode h1 {
+            color: #90caf9; 
+            border-bottom: 3px solid #90caf9;
+        }
+        
+        .dark-mode hr {
+            background-image: linear-gradient(to right, rgba(255, 255, 255, 0), #555, rgba(255, 255, 255, 0));
+        }
+
+        .dark-mode input[type="text"] {
+            background-color: #2e2e2e; 
+            color: #e0e0e0;
+            border: 1px solid #555;
+        }
+        
+        .dark-mode input[type="text"]:focus {
+            border-color: #90caf9;
+            box-shadow: 0 0 0 3px rgba(144, 202, 249, 0.25);
+        }
+
+        /* ========================================================= */
+        /* أزرار الزوايا العلوية - ظاهرة في البداية */
+        /* ========================================================= */
+        #modeToggleButton {
+            position: absolute; top: 25px; left: 25px;
+            background-color: #007bff; color: white; border: none;
+            width: 45px; height: 45px; padding: 0; border-radius: 8px;
+            cursor: pointer; font-size: 20px; display: flex;
+            justify-content: center; align-items: center; transition: background-color 0.3s;
+            z-index: 1000;
+        }
+        #modeToggleButton:hover { background-color: #0056b3; }
+        
+        #settingsButton {
+            position: absolute; top: 25px; right: 25px; background: none; border: none;
+            color: #333; cursor: pointer; font-size: 28px; width: 45px; height: 45px;
+            display: flex; justify-content: center; align-items: center; transition: color 0.3s, transform 0.2s;
+            z-index: 1000;
+        }
+        #settingsButton:hover { color: #007bff; transform: rotate(30deg); }
+        .dark-mode #settingsButton { color: #e0e0e0; }
+        .dark-mode #settingsButton:hover { color: #90caf9; }
+        
+        #savedCodesButton {
+            position: absolute; top: 25px; right: 80px; background: none; border: none;
+            color: #333; cursor: pointer; font-size: 28px; width: 45px; height: 45px;
+            display: flex; justify-content: center; align-items: center; transition: color 0.3s, transform 0.2s;
+            z-index: 1000;
+        }
+
+        #savedCodesButton:hover { color: #28a745; transform: scale(1.1); }
+        .dark-mode #savedCodesButton { color: #e0e0e0; }
+        .dark-mode #savedCodesButton:hover { color: #4CAF50; }
+
+        /* زر الخروج (Exit Button) */
         #exitButton {
             position: fixed; top: 20px; left: 20px; 
             background: #dc3545; color: white; border: none;
             border-radius: 50%; width: 55px; height: 55px; font-size: 24px;
-            cursor: move; 
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            z-index: 1000; display: none; 
-            transition: background 0.2s; 
+            cursor: move; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            z-index: 1000; display: none; transition: background 0.2s; 
         }
         #exitButton:hover { background: #c82333; }
+        
+        /* ========================================================= */
+        /* أنماط المربع المنبثق (Modal) لـ الأكواد المحفوظة */
+        /* ========================================================= */
+        .modal {
+            display: none; 
+            position: fixed; z-index: 2000; left: 0; top: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); 
+            backdrop-filter: blur(5px);
+            justify-content: center; align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 800px; /* زيادة العرض للجدول */
+            position: relative;
+            animation: fadeIn 0.3s;
+        }
+
+        .dark-mode .modal-content {
+            background-color: #1e1e1e;
+            color: #fefefe;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* زر الإغلاق داخل المربع */
+        .close-button {
+            color: #aaa;
+            float: left; 
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .close-button:hover, .close-button:focus { color: #000; text-decoration: none; }
+        .dark-mode .close-button:hover { color: #fff; }
+
+
+        /* ========================================================= */
+        /* تصميم الجدول العصري (Saved Codes Table) */
+        /* ========================================================= */
+        #savedCodesTable {
+            width: 100%;
+            border-collapse: separate; /* لفصل الحدود وإعطاء حدود دائرية */
+            border-spacing: 0 8px; /* مسافة بين الصفوف */
+            margin-top: 20px;
+            text-align: right;
+        }
+        
+        /* رؤوس الجدول (Header) */
+        #savedCodesTable th {
+            background-color: #007bff;
+            color: white;
+            padding: 15px 10px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 16px;
+            position: sticky; /* لجعل الرؤوس ثابتة عند التمرير */
+            top: 0;
+            z-index: 10;
+        }
+        
+        /* ضبط الحدود الدائرية لرؤوس الجدول */
+        #savedCodesTable thead tr th:first-child { border-top-right-radius: 8px; }
+        #savedCodesTable thead tr th:last-child { border-top-left-radius: 8px; }
+
+        /* خلايا الجدول */
+        #savedCodesTable td {
+            background-color: #f9f9f9;
+            padding: 12px 10px;
+            text-align: center;
+            border: none;
+            transition: background-color 0.3s;
+        }
+        
+        /* الصفوف (Rows) */
+        #savedCodesTable tbody tr {
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        /* تأثير Hover على الصف */
+        #savedCodesTable tbody tr:hover td {
+            background-color: #e6f7ff; /* لون فاتح عند المرور */
+        }
+
+        /* الوضع الداكن للجدول */
+        .dark-mode #savedCodesTable th {
+            background-color: #4a4e69;
+        }
+        .dark-mode #savedCodesTable td {
+            background-color: #2e2e2e;
+            color: #e0e0e0;
+        }
+        .dark-mode #savedCodesTable tbody tr:hover td {
+            background-color: #3b3f54;
+        }
+
+        /* حقول العرض (الاسم والكود) */
+        .url-cell {
+            font-size: 14px;
+            text-align: right;
+            color: #007bff;
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .code-cell {
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        /* زر الفتح داخل الجدول - الأيقونة فقط مع خلفية شفافة */
+        .open-code-btn {
+            background-color: transparent; /* خلفية شفافة */
+            color: #007bff; /* لون الأيقونة */
+            border: none;
+            padding: 6px; /* تقليل الحشوة */
+            border-radius: 50%; /* شكل دائري */
+            cursor: pointer;
+            font-size: 18px; /* حجم الأيقونة */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px; /* عرض ثابت */
+            height: 36px; /* ارتفاع ثابت */
+            transition: all 0.3s ease;
+        }
+        .open-code-btn:hover { 
+            background-color: rgba(0, 123, 255, 0.1); /* خلفية شفافة عند التمرير */
+            color: #0056b3; /* لون أغمق عند التمرير */
+            transform: scale(1.1); /* تكبير بسيط */
+        }
+        
+        /* زر المسح داخل الجدول */
+        .delete-code-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-right: 5px;
+            transition: background-color 0.3s;
+        }
+        .delete-code-btn:hover { background-color: #c82333; }
+        
+        /* باقي أنماط Iframe و Toast */
+        #websiteContainer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 999; background-color: #000; }
+        #websiteFrame { width: 100%; height: 100%; border: none; }
+        #toastNotification { position: fixed; top: 20px; right: 20px; background-color: #333; color: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); opacity: 0; transition: opacity 0.5s, transform 0.5s; transform: translateY(-50px); z-index: 1001; font-size: 16px; min-width: 250px; text-align: center; }
+        .show-toast { opacity: 1 !important; transform: translateY(0) !important; }
+
     </style>
 </head>
 <body>
     
+    <button id="modeToggleButton"></button>
+
+    <button id="settingsButton">
+        <span class="material-symbols-rounded">settings</span>
+    </button>
+    
+    <button id="savedCodesButton">
+        <span class="material-symbols-rounded">download</span>
+    </button>
+
     <div id="loginScreen">
-        <h1>🔑 نظام الدخول الذكي</h1>
+        <h1><span class="material-symbols-rounded">key</span> نظام الدخول الذكي</h1>
         
         <input type="text" id="accessCode" placeholder="أدخل الرمز هنا (مثال: 123.456.789 أو 11342)">
-        <button id="loginButton">دخول وتسجيل</button>
+        
+        <button id="loginButton">دخول وتسجيل الرمز</button>
         <hr>
-
-        <h2>📚 الدخول عبر الأكواد المحفوظة</h2>
-        <ul id="savedCodesList">
-            </ul>
     </div>
 
+    <div id="savedCodesModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2><span class="material-symbols-rounded">archive</span> الأكواد المحفوظة</h2>
+            <div style="max-height: 400px; overflow-y: auto;">
+                <table id="savedCodesTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 10%;">#</th>
+                            <th style="width: 45%;">الاسم / الرابط</th>
+                            <th style="width: 15%;">الكود</th>
+                            <th style="width: 30%;">التحكم</th>
+                        </tr>
+                    </thead>
+                    <tbody id="savedCodesList">
+                        </tbody>
+                </table>
+            </div>
+            
+        </div>
+    </div>
+
+    <div id="toastNotification"></div>
     <div id="websiteContainer">
         <iframe id="websiteFrame" src="" title="الموقع الداخلي"></iframe>
     </div>
 
-    <button id="exitButton">❌</button>
+    <button id="exitButton"><span class="material-symbols-rounded">close</span></button>
 
     <script>
         // تعريف الروابط والأكواد
         const ACCESS_URL_DEFAULT = "https://fkhames819-cloud.github.io/ALGEL-ALKHAMES/";
         const SAVED_CODES_KEY = "algil_alkhames_codes";
 
-        // **تعريف كل الأكواد التي يمكن حفظها وروابطها (تمت إضافة 11342)**
+        // =========================================================
+        // التعديل 1: استخدام كائنات لحفظ الرابط والاسم المخصص
+        // =========================================================
         const SAVABLE_CODES_MAP = {
-            "123.456.789": "https://fkhames819-cloud.github.io/ALGEL-ALKHAMES/",
-            "987.654.321": "https://example.com/page1", 
-            "111.222.333": "https://anothersite.net/pageA", 
-            // **الكود الجديد:**
-            "11342": "https://poki.com/ar/" 
+            "123.456.789": { 
+                url: "https://fkhames819-cloud.github.io/ALGEL-ALKHAMES/", 
+                name: "الموقع الرئيسي (الجيل الخامس)" 
+            },
+            "987.654.321": { 
+                url: "https://example.com/page1", 
+                name: "صفحة تجريبية 1" 
+            }, 
+            "111.222.333": { 
+                url: "https://anothersite.net/pageA", 
+                name: "صفحة تجريبية A" 
+            }, 
+            "11342": { 
+                url: "https://poki.com/ar/", 
+                name: "ألعاب بوكي (Poki)" 
+            },
+            "12345": { 
+                url: "https://www.youtube.com/", 
+                name: "يوتيوب" 
+            }
         };
         
-        // تعريف كل الأكواد التي لا يتم حفظها (الدخول المباشر)
         const DIRECT_ENTRY_CODES_MAP = {
             "121.324.543": "https://fkhames819-cloud.github.io/ALGEL-ALKHAMES/",
             "444.555.666": "https://quick-access.org/q1", 
@@ -147,14 +430,88 @@
         const websiteFrame = document.getElementById('websiteFrame');
         const codeInput = document.getElementById('accessCode');
         const loginButton = document.getElementById('loginButton');
-        const savedCodesList = document.getElementById('savedCodesList');
         const exitButton = document.getElementById('exitButton');
+        const toastNotification = document.getElementById('toastNotification'); 
+        
+        const modeToggleButton = document.getElementById('modeToggleButton'); 
+        const settingsButton = document.getElementById('settingsButton'); 
+        
+        // تعريف العناصر الجديدة للمحفوظات
+        const savedCodesButton = document.getElementById('savedCodesButton');
+        const savedCodesModal = document.getElementById('savedCodesModal');
+        const savedCodesList = document.getElementById('savedCodesList');
+        const modalCloseButton = savedCodesModal.querySelector('.close-button');
+
+
+        const body = document.body;
+        
+        const ICON_LIGHT = '<span class="material-symbols-rounded">light_mode</span>';
+        const ICON_DARK = '<span class="material-symbols-rounded">dark_mode</span>';
 
         let isDragging = false;
         let offset = { x: 0, y: 0 };
         let lastClickTime = 0; 
 
-        // 1. وظائف التخزين المحلي
+        // =========================================================
+        // دالة لإخفاء الأزرار العلوية
+        // =========================================================
+        function hideTopButtons() {
+            modeToggleButton.style.display = 'none';
+            settingsButton.style.display = 'none';
+            savedCodesButton.style.display = 'none';
+        }
+
+        // =========================================================
+        // دالة لإظهار الأزرار العلوية
+        // =========================================================
+        function showTopButtons() {
+            modeToggleButton.style.display = 'flex';
+            settingsButton.style.display = 'flex';
+            savedCodesButton.style.display = 'flex';
+        }
+
+        // =========================================================
+        // منطق الوضع الداكن (Dark Mode Logic) 
+        // =========================================================
+
+        function toggleDarkMode() {
+            body.classList.toggle('dark-mode');
+            const isDarkMode = body.classList.contains('dark-mode');
+            modeToggleButton.innerHTML = isDarkMode ? ICON_LIGHT : ICON_DARK;
+            localStorage.setItem('themeMode', isDarkMode ? 'dark' : 'light');
+        }
+
+        function applySavedMode() {
+            const savedMode = localStorage.getItem('themeMode');
+            if (savedMode === 'dark') {
+                body.classList.add('dark-mode');
+                modeToggleButton.innerHTML = ICON_LIGHT;
+            } else {
+                 modeToggleButton.innerHTML = ICON_DARK;
+            }
+        }
+
+        modeToggleButton.addEventListener('click', toggleDarkMode);
+        applySavedMode();
+        
+        settingsButton.addEventListener('click', () => {
+             showToast("🛠️ تم النقر على زر الإعدادات! (الوظيفة غير مفعلة حالياً)");
+        });
+
+
+        // =========================================================
+        // منطق الأكواد المحفوظة (Saved Codes Logic)
+        // =========================================================
+        
+        function showToast(message) {
+            toastNotification.textContent = message;
+            toastNotification.classList.add('show-toast');
+            
+            setTimeout(() => {
+                toastNotification.classList.remove('show-toast');
+            }, 3000);
+        }
+
         function getSavedCodes() {
             try {
                 const codes = localStorage.getItem(SAVED_CODES_KEY);
@@ -165,14 +522,62 @@
             }
         }
 
-        function saveCode(code, total) {
+        // =========================================================
+        // التعديل 2: تعديل دالة الحفظ لاستخدام الاسم المخصص
+        // =========================================================
+        function saveCode(code) {
             const codes = getSavedCodes();
-            // تحقق من الكود القابل للحفظ ووجوده في الخريطة
-            if (SAVABLE_CODES_MAP[code] && !codes.find(item => item.code === code)) {
+            const codeData = SAVABLE_CODES_MAP[code]; // استخراج الكائن كاملاً
+            
+            if (codeData && !codes.find(item => item.code === code)) {
                 const id = Date.now().toString(); 
-                codes.push({ id, code, total, url: SAVABLE_CODES_MAP[code] }); // حفظ الرابط أيضاً
+                
+                // استخدام الاسم المخصص (codeData.name) والرابط (codeData.url) مباشرة
+                codes.push({ id, code, total: codeData.name, url: codeData.url });
                 localStorage.setItem(SAVED_CODES_KEY, JSON.stringify(codes));
             }
+        }
+
+        // وظيفة عرض جميع الأكواد من SAVABLE_CODES_MAP في الجدول
+        function renderAllCodes() {
+            savedCodesList.innerHTML = ''; // تفريغ القائمة قبل إعادة التعبئة
+
+            if (Object.keys(SAVABLE_CODES_MAP).length === 0) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = '<td colspan="4" style="text-align: center; color: #888; padding: 20px;">لا توجد أكواد متاحة حالياً.</td>';
+                savedCodesList.appendChild(tr);
+                return;
+            }
+
+            let index = 1;
+            for (const [code, codeData] of Object.entries(SAVABLE_CODES_MAP)) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="id-cell">${index}</td>
+                    <td class="url-cell" title="${codeData.url}">${codeData.name}</td>
+                    <td class="code-cell">${code}</td>
+                    <td class="control-cell">
+                        <button class="open-code-btn" data-code="${code}" data-url="${codeData.url}" title="فتح ${codeData.name}">
+                            <span class="material-symbols-rounded">open_in_new</span>
+                        </button>
+                    </td>
+                `;
+                savedCodesList.appendChild(tr);
+                index++;
+            }
+
+            // إضافة معالج حدث لأزرار الفتح
+            savedCodesList.querySelectorAll('.open-code-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const code = e.currentTarget.getAttribute('data-code');
+                    const url = e.currentTarget.getAttribute('data-url');
+                    
+                    // إغلاق المربع المنبثق والدخول للموقع
+                    savedCodesModal.style.display = 'none';
+                    enterWebsite(url, code);
+                    showToast("✅ الدخول إلى الموقع المحدد.");
+                });
+            });
         }
 
         // وظيفة مسح كود واحد
@@ -181,96 +586,145 @@
             codes = codes.filter(item => item.id !== idToDelete);
             localStorage.setItem(SAVED_CODES_KEY, JSON.stringify(codes));
             renderSavedCodes(); 
-            alert("تم مسح الكود بنجاح!");
+            showToast("✅ تم مسح الكود بنجاح!");
         }
 
+        // دالة عرض الأكواد المحفوظة في المربع المنبثق (باستخدام هيكل الجدول)
         function renderSavedCodes() {
-            savedCodesList.innerHTML = '';
             const codes = getSavedCodes();
+            savedCodesList.innerHTML = ''; // تفريغ القائمة قبل إعادة التعبئة
+
             if (codes.length === 0) {
-                savedCodesList.innerHTML = '<li style="text-align: center; color: #999;">لا توجد أكواد محفوظة بعد.</li>';
+                const tr = document.createElement('tr');
+                tr.innerHTML = '<td colspan="4" style="text-align: center; color: #888; padding: 20px;">لا توجد أكواد محفوظة حالياً.</td>';
+                savedCodesList.appendChild(tr);
                 return;
             }
-            
-            codes.forEach(item => {
-                const li = document.createElement('li');
-                
-                const nameSpan = document.createElement('span');
-                nameSpan.className = 'saved-code-name';
-                nameSpan.textContent = `📄 ${item.total}`; 
-                nameSpan.addEventListener('click', () => { 
-                    enterWebsite(item.url, item.code); // نستخدم الرابط المحفوظ
-                });
 
-                const deleteButton = document.createElement('button');
-                deleteButton.className = 'delete-single-button';
-                deleteButton.textContent = '❌ مسح';
-                deleteButton.addEventListener('click', (e) => {
-                    e.stopPropagation(); 
-                    const confirmation = confirm(`هل أنت متأكد من مسح صفحة "${item.total}"؟`);
+            codes.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="id-cell">${index + 1}</td>
+                    <td class="url-cell" title="${item.url}">${item.total}</td>
+                    <td class="code-cell">${item.code}</td>
+                    <td class="control-cell">
+                        <button class="open-code-btn" data-code="${item.code}" data-url="${item.url}" title="فتح ${item.total}">
+                            <span class="material-symbols-rounded">open_in_new</span>
+                        </button>
+                        <button class="delete-code-btn" data-id="${item.id}">
+                            <span class="material-symbols-rounded" style="font-size: 16px;">delete</span>
+                            مسح
+                        </button>
+                    </td>
+                `;
+                savedCodesList.appendChild(tr);
+            });
+
+            // إضافة معالج حدث لأزرار الفتح
+            savedCodesList.querySelectorAll('.open-code-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const code = e.currentTarget.getAttribute('data-code');
+                    const url = e.currentTarget.getAttribute('data-url');
+                    
+                    // إغلاق المربع المنبثق والدخول للموقع
+                    savedCodesModal.style.display = 'none';
+                    enterWebsite(url, code);
+                    showToast("✅ الدخول إلى الموقع المحفوظ.");
+                });
+            });
+            
+            // إضافة معالج حدث لأزرار المسح
+            savedCodesList.querySelectorAll('.delete-code-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const idToDelete = e.currentTarget.getAttribute('data-id');
+                    const itemToDelete = codes.find(item => item.id === idToDelete);
+                    const confirmation = confirm(`هل أنت متأكد من مسح صفحة "${itemToDelete.total}"؟`);
                     if (confirmation) {
-                         deleteSingleCode(item.id);
+                         deleteSingleCode(idToDelete);
                     }
                 });
-
-                li.appendChild(nameSpan);
-                li.appendChild(deleteButton);
-                savedCodesList.appendChild(li);
             });
         }
         
-        // تم تحديث الدالة لتأخذ الرابط والكود
-        function enterWebsite(url, code) {
-            // يتم توجيه الرابط وإضافة الكود كمتغير (query parameter)
-            websiteFrame.src = url + `?code=${code}`; 
-            
-            loginScreen.style.display = 'none';
-            websiteContainer.style.display = 'block';
-            exitButton.style.display = 'block';
-            document.body.style.overflow = 'hidden'; 
-        }
+        // دالة فتح المربع المنبثق وعرض جميع الأكواد
+        savedCodesButton.addEventListener('click', () => {
+            renderAllCodes(); // عرض جميع الأكواد من SAVABLE_CODES_MAP
+            savedCodesModal.style.display = 'flex'; // استخدام flex لعرض المودال
+        });
 
-        // 2. منطق زر الدخول
-        loginButton.addEventListener('click', () => {
-            const code = codeInput.value.trim();
-            const knownSavableCode = SAVABLE_CODES_MAP[code]; // التحقق من الأكواد القابلة للحفظ
-            const knownDirectCode = DIRECT_ENTRY_CODES_MAP[code]; // التحقق من أكواد الدخول المباشر
-            const isSavedCode = getSavedCodes().some(item => item.code === code); // التحقق من الأكواد المحفوظة مسبقاً
-            
-            // 1. الدخول المباشر (الرمز موجود في خريطة DIRECT_ENTRY_CODES_MAP)
-            if (knownDirectCode) {
-                alert("تم التعرف على الرمز الخاص (بدون تسجيل). جاري الدخول المباشر...");
-                enterWebsite(knownDirectCode, code); 
-            } 
-            // 2. الدخول القابل للحفظ (الرمز موجود في خريطة SAVABLE_CODES_MAP)
-            else if (knownSavableCode) {
-                if (!isSavedCode) {
-                    const now = new Date();
-                    // اسم فريد يعتمد على الكود والرابط
-                    const totalName = (knownSavableCode.includes("poki.com")) ? 
-                        `لعبة بوكي (Poki) - الكود: ${code}` : 
-                        `الدخول لـ: ${knownSavableCode.substring(8, 25)}...`; 
-                    saveCode(code, totalName);
-                    renderSavedCodes();
-                    alert(`تم تسجيل الكود بنجاح باسم "${totalName}". جاري الدخول...`);
-                } else {
-                    alert("تم التعرف على الكود. جاري الدخول...");
-                }
-                enterWebsite(knownSavableCode, code);
-            } 
-            // 3. الدخول بالكود المحفوظ مسبقاً
-            else if (isSavedCode) {
-                const savedItem = getSavedCodes().find(item => item.code === code);
-                alert("تم التعرف على الكود المحفوظ. جاري الدخول...");
-                enterWebsite(savedItem.url, savedItem.code);
-            } 
-            // 4. الرمز غير معروف
-            else {
-                alert("رمز الدخول غير صحيح أو غير مسجّل. يرجى إدخال الرمز الصحيح للمتابعة.");
+        // دالة إغلاق المربع المنبثق عند النقر على علامة X
+        modalCloseButton.addEventListener('click', () => {
+            savedCodesModal.style.display = 'none';
+        });
+
+        // دالة إغلاق المربع المنبثق عند النقر خارج المربع
+        window.addEventListener('click', (event) => {
+            if (event.target === savedCodesModal) {
+                savedCodesModal.style.display = 'none';
             }
         });
 
-        // 3. وظيفة الخروج (ضغطة مزدوجة)
+
+        // =========================================================
+        // منطق الدخول (Login Logic)
+        // =========================================================
+
+        function enterWebsite(url, code) {
+            websiteFrame.src = url + `?code=${code}`; 
+            
+            loginScreen.style.display = 'none';
+            websiteContainer.style.display = 'block'; 
+            exitButton.style.display = 'block';
+            document.body.style.overflow = 'hidden'; 
+            
+            // إخفاء الأزرار العلوية عند الدخول
+            hideTopButtons();
+        }
+
+        loginButton.addEventListener('click', () => {
+            const code = codeInput.value.trim();
+
+            if (!code) {
+                showToast("⚠️ يرجى إدخال رمز الدخول أولاً.");
+                return;
+            }
+
+            // =========================================================
+            // التعديل 3: استخراج بيانات الكود القابل للحفظ بشكل صحيح (ككائن)
+            // =========================================================
+            const knownSavableCodeData = SAVABLE_CODES_MAP[code]; 
+            const knownDirectCode = DIRECT_ENTRY_CODES_MAP[code]; 
+            const isSavedCode = getSavedCodes().some(item => item.code === code); 
+            
+            if (knownDirectCode) {
+                showToast("✅ تم التعرف على الرمز الخاص. جاري الدخول المباشر...");
+                enterWebsite(knownDirectCode, code); 
+            } 
+            else if (knownSavableCodeData) {
+                if (!isSavedCode) {
+                    saveCode(code); 
+                    renderSavedCodes(); // للتأكد من تحديث القائمة فوراً
+                    showToast(`➕ تم تسجيل الكود بنجاح. جاري الدخول...`);
+                } else {
+                    showToast("✅ تم التعرف على الكود. جاري الدخول...");
+                }
+                // استخدام knownSavableCodeData.url للدخول
+                enterWebsite(knownSavableCodeData.url, code);
+            } 
+            else if (isSavedCode) {
+                const savedItem = getSavedCodes().find(item => item.code === code);
+                showToast("✅ تم التعرف على الكود المحفوظ. جاري الدخول...");
+                enterWebsite(savedItem.url, savedItem.code);
+            } 
+            else {
+                showToast("❌ رمز الدخول غير صحيح أو غير مسجّل. يرجى إدخال الرمز الصحيح للمتابعة.");
+            }
+        });
+
+        // =========================================================
+        // منطق زر الخروج (Exit Button Logic)
+        // =========================================================
+
         function handleDoubleClickExit() {
             websiteFrame.src = "about:blank"; 
             websiteContainer.style.display = 'none';
@@ -278,10 +732,12 @@
             loginScreen.style.display = 'block';
             document.body.style.overflow = 'auto'; 
             
-            alert("تم الخروج من الموقع الداخلي والعودة إلى شاشة البوابة.");
+            // إظهار الأزرار العلوية عند العودة لشاشة الدخول
+            showTopButtons();
+            
+            showToast("👋 تم الخروج من الموقع الداخلي والعودة إلى شاشة البوابة.");
         }
 
-        // 4. منطق السحب والإفلات لزر الخروج (Drag and Drop Logic)
         exitButton.addEventListener('mousedown', (e) => {
             e.preventDefault(); 
             const clickTime = Date.now();
@@ -304,17 +760,21 @@
             const newX = e.clientX - offset.x;
             const newY = e.clientY - offset.y;
             
-            exitButton.style.left = newX + 'px';
-            exitButton.style.top = newY + 'px';
+            const maxX = window.innerWidth - exitButton.offsetWidth;
+            const maxY = window.innerHeight - exitButton.offsetHeight;
+            
+            // تحديد الحركة داخل حدود الشاشة
+            exitButton.style.left = Math.max(0, Math.min(newX, maxX)) + 'px';
+            exitButton.style.top = Math.max(0, Math.min(newY, maxY)) + 'px';
         });
 
         document.addEventListener('mouseup', () => {
             isDragging = false;
         });
 
-
-        // عند تحميل الصفحة
-        window.onload = renderSavedCodes;
+        // تشغيل وظيفة تطبيق الوضع المحفوظ عند التحميل
+        applySavedMode();
+        
     </script>
 </body>
 </html>
